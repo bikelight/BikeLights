@@ -8,12 +8,12 @@ https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/
 
 The libraries used in this program are:
 
-*MSGEQ7 
+* MSGEQ7 
 https://github.com/NicoHood/MSGEQ7
 
 Which can be purchased here https://www.sparkfun.com/products/10468
 
-*FastLED
+* FastLED
 https://github.com/FastLED/FastLED
 
 
