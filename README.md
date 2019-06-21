@@ -13,7 +13,7 @@ https://github.com/NicoHood/MSGEQ7
 
 Which can be purchased here https://www.sparkfun.com/products/10468
 
-* FstLED
+*FastLED
 https://github.com/FastLED/FastLED
 
 
