@@ -15,15 +15,15 @@ WiFiUDP udp;
 //bool sendPacket(const IPAddress& address, const uint8_t* buf, uint8_t bufSize);
 //void receivePacket();
 
-//--MSGEQ7 config
-#include "MSGEQ7.h"
-#define pinAnalog A0
-#define pinReset  14    //15
-#define pinStrobe 16    //0
-#define MSGEQ7_INTERVAL ReadsPerSecond(50)  //This is driving the main loop at ~50 samples / sec
-#define MSGEQ7_SMOOTH 191 // Range: 0-255
-CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalog> MSGEQ7;
-#define pinLed LED_BUILTIN  //for pwm output led on Master board
+////--MSGEQ7 config
+//#include "MSGEQ7.h"
+//#define pinAnalog A0
+//#define pinReset 15
+//#define pinStrobe 0
+//#define MSGEQ7_INTERVAL ReadsPerSecond(50)  //This is driving the main loop at ~50 samples / sec
+//#define MSGEQ7_SMOOTH 191 // Range: 0-255
+//CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalog> MSGEQ7;
+//#define pinLed 16  //for pwm output led on Master board
 
 
 void setup() {
@@ -35,9 +35,9 @@ void setup() {
   WiFi.begin(ssid, pass);
 
   // This will set the IC ready for reading
-  MSGEQ7.begin();
+  //MSGEQ7.begin();
   // led setup
-  pinMode(pinLed, OUTPUT);
+  //pinMode(pinLed, OUTPUT);
 
   //  while (WiFi.status() != WL_CONNECTED) {
   //    digitalWrite(ledPin, ! digitalRead(ledPin));
@@ -63,41 +63,51 @@ void setup() {
   Serial.println(udp.localPort());
 }
 
+uint8_t input = 0;
+
 void loop() {
 
-  // Analyzeevery interval - set to 50 samples / sec
-  bool newReading = MSGEQ7.read(MSGEQ7_INTERVAL);
-
-  //  static uint32_t nextTime = 0;
-  //  if (millis() >= nextTime) {
-  // Led output
-  if (newReading) {
-    // Read bass frequency
-    uint8_t input = MSGEQ7.get(MSGEQ7_BASS);
-    input = mapNoise(input);
-
-    if (input >= 1) {
-
-      // Output PWM signal via Led to the music beat
-      analogWrite(pinLed, input);
-      analogWrite(ledPin, input);
-      Serial.print("Sound level: ");
-      Serial.print(input);
-      Serial.print("   ");
-      Serial.println(millis());
-
-      sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input));
-
-      //    if (millis() >= nextTime) {
-      //      if (! sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input)))
-      //        Serial.println(F("Error sending broadcast UDP packet!"));
-      //      nextTime = millis() + stepDuration;
-      //    }
-      //nextTime = millis() + stepDuration;
-    }
-  }
+//  // Analyzeevery interval - set to 50 samples / sec
+//  bool newReading = MSGEQ7.read(MSGEQ7_INTERVAL);
+//
+//  //  static uint32_t nextTime = 0;
+//  //  if (millis() >= nextTime) {
+//  // Led output
+//  if (newReading) {
+//    // Read bass frequency
+//    uint8_t input = MSGEQ7.get(MSGEQ7_BASS);
+//    input = mapNoise(input);
+//
+//    if (input >= 1) {
+//
+//      // Output PWM signal via Led to the music beat
+//      analogWrite(pinLed, input);
+//      analogWrite(ledPin, input);
+//      Serial.print("Sound level: ");
+//      Serial.print(input);
+//      Serial.print("   ");
+//      Serial.println(millis());
+//
+//      sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input));
+//
+//      //    if (millis() >= nextTime) {
+//      //      if (! sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input)))
+//      //        Serial.println(F("Error sending broadcast UDP packet!"));
+//      //      nextTime = millis() + stepDuration;
+//      //    }
+//      //nextTime = millis() + stepDuration;
+//    }
+//  }
   //}
-  delay(1);
+  
+  input = 255;
+  sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input));
+  delay(500);
+
+
+  input = 0;
+  sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input));
+  delay(500);
 }
 
 bool sendPacket(const IPAddress & address, const uint8_t* buf, uint8_t bufSize) {

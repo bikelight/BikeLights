@@ -16,7 +16,7 @@ FASTLED_USING_NAMESPACE
 #define LED_PINS    2
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2811 // WS2811 LPD8806
-#define NUM_LEDS    75
+#define NUM_LEDS    90
 
 #define BRIGHTNESS  255  // reduce power consumption
 #define LED_DITHER  255  // try 0 to disable flickering
@@ -119,11 +119,11 @@ void loop()
         Serial.printf("color: %d, %d, %d", color.hue, color.sat, color.val);
       */
 
-      fill_solid(leds, NUM_LEDS, color);
+      fill_solid(leds, NUM_LEDS, val);
     }
   }
   else {
-    gPatterns[gCurrentPatternNumber]();
+   // gPatterns[gCurrentPatternNumber]();
   }
   // Update Leds
   FastLED.show();
