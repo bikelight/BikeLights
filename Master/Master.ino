@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include "MovingAverage.h"
 
 //Wifi config
 const int8_t ledPin = LED_BUILTIN;
@@ -23,13 +24,28 @@ WiFiUDP udp;
 #define MSGEQ7_INTERVAL ReadsPerSecond(50)  //This is driving the main loop at ~50 samples / sec
 #define MSGEQ7_SMOOTH 191 // Range: 0-255
 CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalog> MSGEQ7;
-#define pinLed LED_BUILTIN  //for pwm output led on Master board
+//#define pinLed 11  //for pwm output led on Master board
 
+
+//MovingAverage filter(5);
+double filteredOutput[7] = {0};
+double filteredInts[7] = {0};
+int filterLength = 5;
+MovingAverage filters[] = {MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength)
+                          };
+
+double soundVolume = 0;
 
 void setup() {
   Serial.begin(115200);
   Serial.println();
-  pinMode(ledPin, OUTPUT);
+//  pinMode(ledPin, OUTPUT);
   Serial.print(F("Connecting to "));
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
@@ -37,7 +53,7 @@ void setup() {
   // This will set the IC ready for reading
   MSGEQ7.begin();
   // led setup
-  pinMode(pinLed, OUTPUT);
+ // pinMode(pinLed, OUTPUT);
 
   //  while (WiFi.status() != WL_CONNECTED) {
   //    digitalWrite(ledPin, ! digitalRead(ledPin));
@@ -46,7 +62,7 @@ void setup() {
   //  }
 
 
-  digitalWrite(ledPin, HIGH);
+//  digitalWrite(ledPin, HIGH);
   Serial.println();
 
   Serial.println(F("WiFi connected"));
@@ -65,28 +81,33 @@ void setup() {
 
 void loop() {
 
-  // Analyzeevery interval - set to 50 samples / sec
   bool newReading = MSGEQ7.read(MSGEQ7_INTERVAL);
 
-  //  static uint32_t nextTime = 0;
-  //  if (millis() >= nextTime) {
   // Led output
   if (newReading) {
-    // Read bass frequency
-    uint8_t input = MSGEQ7.get(MSGEQ7_BASS);
-    input = mapNoise(input);
 
-    if (input >= 1) {
+    for (int i = 0; i < 7; i++) {
+      double input = MSGEQ7.get(i);
+     // input = mapNoise(input);
+      //filteredOutput[i] = filters[i].addSample(input);
+      filteredOutput[i] = input;
+    }
 
-      // Output PWM signal via Led to the music beat
-      analogWrite(pinLed, input);
-      analogWrite(ledPin, input);
-      Serial.print("Sound level: ");
-      Serial.print(input);
-      Serial.print("   ");
-      Serial.println(millis());
+    soundVolume = MSGEQ7.getVolume();
 
-      sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input));
+    if (soundVolume >= 1) {
+      
+      Serial.print("Sound volume is: ");
+      Serial.print(soundVolume);
+      Serial.print("  ");
+      for ( int i = 0; i < 7; i++) {
+        Serial.print(filteredOutput[i]);
+        Serial.print("  ");
+      }
+      //Serial.println(millis());
+      Serial.println("");
+  
+    //  sendPacket(broadcastAddress, (uint8_t*)&filteredOutput, sizeof(filteredOutput));
 
       //    if (millis() >= nextTime) {
       //      if (! sendPacket(broadcastAddress, (uint8_t*)&input, sizeof(input)))

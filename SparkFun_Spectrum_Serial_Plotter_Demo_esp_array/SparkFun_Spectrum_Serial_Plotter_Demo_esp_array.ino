@@ -27,14 +27,14 @@ int i;
 
 //MovingAverage filter(5);
 double filteredOutput[7] = {0};
-
-MovingAverage filters[] = {MovingAverage(5), 
-                           MovingAverage(5),
-                           MovingAverage(5),
-                           MovingAverage(5),
-                           MovingAverage(5),
-                           MovingAverage(5),
-                           MovingAverage(5)};
+int filterLength = 7;
+MovingAverage filters[] = {MovingAverage(filterLength), 
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength),
+                           MovingAverage(filterLength)};
 
 /********************Setup Loop*************************/
 void setup() {
@@ -88,7 +88,7 @@ void Read_Frequencies() {
 
 /*****************Print Out Band Values for Serial Plotter*****************/
 void Graph_Frequencies() {
-  for (i = 0; i < 1; i++)
+  for (i = 0; i < 7; i++)
   {
     //    Serial.print(Frequencies_One[i]);
     //    Serial.print(" ");

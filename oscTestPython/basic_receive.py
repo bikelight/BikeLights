@@ -16,7 +16,7 @@ import time, threading
 
 
 # tupple with ip, port. i dont use the () but maybe you want -> send_address = ('127.0.0.1', 9000)
-receive_address = '10.3.1.224', 9000
+receive_address = '', 54321
 
 
 # OSC Server. there are three different types of server. 
@@ -42,8 +42,32 @@ def printing_handler(addr, tags, stuff, source):
     print "data %s" % stuff
     print "---"
 
-s.addMsgHandler("/print", printing_handler) # adding our function
+# define a message-handler function for the server to call.
+def printing_handler_simple(addr, tags, stuff, source):
+    #print "---"
+    #print "r %s" % OSC.getUrlStr(source)
+    #print "a %s" % addr
+    #print "typetags %s" % tags
+    print "data %s" % stuff
+    #print "---"
 
+def nothing(addr, tags, stuff, source):
+    return 
+    #print "---"
+    #print "r %s" % OSC.getUrlStr(source)
+    #print "a %s" % addr
+    #print "typetags %s" % tags
+    #print "data %s" % stuff
+    #print "---"
+
+s.addMsgHandler("/print", printing_handler) # adding our function
+s.addMsgHandler("/vals/0", printing_handler_simple) # adding our function
+s.addMsgHandler("/vals/1", nothing) # adding our function
+s.addMsgHandler("/vals/2", nothing) # adding our function
+s.addMsgHandler("/vals/3", nothing) # adding our function
+s.addMsgHandler("/vals/4", nothing) # adding our function
+s.addMsgHandler("/vals/5", nothing) # adding our function
+s.addMsgHandler("/vals/6", nothing) # adding our function
 
 # just checking which handlers we have added
 print "Registered Callback-functions are :"
@@ -55,7 +79,6 @@ for addr in s.getOSCAddressSpace():
 print "\nStarting OSCServer. Use ctrl-C to quit."
 st = threading.Thread( target = s.serve_forever )
 st.start()
-
 
 try :
     while 1 :
